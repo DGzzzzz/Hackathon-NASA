@@ -10,7 +10,7 @@ const loader = new THREE.TextureLoader();
 const starTexture = loader.load('/assets/images/star.jpg');  // Textura da estrela
 const glowTexture = loader.load('/assets/images/glow.png');  // Textura de glow
 const universeTexture = loader.load('/assets/images/universe.jpg');
-const planetTexture = loader.load('/assets/images/planet.jpeg');
+const planetTexture = loader.load('/assets/images/planet.jpg');
 
 // Inicializar a cena
 init();
