@@ -1,16 +1,32 @@
-body {
+body, html {
   margin: 0;
+  padding: 0;
   overflow: hidden;
+  width: 100%;
+  height: 100%;
 }
-
-canvas {
-  display: block;
-}
-
-#info {
+#app {
   position: absolute;
-  top: 10px;
-  left: 10px;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  pointer-events: none; /* Permite cliques passarem para o canvas */
+}
+#info, #toggleRotation {
+  pointer-events: auto; /* Permite cliques nos elementos */
+  margin: 10px;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.5);
   color: white;
-  font-family: sans-serif;
+  border: none;
+  border-radius: 5px;
+  z-index: 100000;
+}
+#toggleRotation {
+  cursor: pointer;
 }
