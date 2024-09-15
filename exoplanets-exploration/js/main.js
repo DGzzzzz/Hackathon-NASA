@@ -5,6 +5,8 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 let scene, camera, renderer, raycaster, stars = [];
 let initialCameraPosition = new THREE.Vector3(0, 0, 50);
 const planetInfo = document.getElementById('info');
+let isFocusedOnStar = false;  // Variável de controle
+let isRotationEnabled = false;  // Variável de controle para rotação
 
 // Carregar texturas
 const loader = new THREE.TextureLoader();
@@ -12,6 +14,40 @@ const starTexture = loader.load('/assets/images/star.jpg');  // Textura da estre
 const glowTexture = loader.load('/assets/images/glow.png');  // Textura de glow
 const universeTexture = loader.load('/assets/images/universe.jpg');
 const planetTexture = loader.load('/assets/images/planet.jpg');
+
+const apiUrl = 'https://exoplanetarchive.ipac.caltech.edu/cgi-bin/nstedAPI/nph-nstedAPI?&table=exoplanets&format=ipac&where=pl_kepflag=1';
+
+fetch(apiUrl)
+  .then(response => response.text()) // Recebe a resposta como texto
+  .then(data =>
+  {
+    const jsonData = parseIPAC(data); // Converter IPAC para JSON
+    console.log(jsonData); // Exibir dados no console
+  })
+  .catch(error =>
+  {
+    console.error('Error fetching data:', error);
+  });
+
+
+// Função para converter IPAC para JSON
+function parseIPAC(ipacData)
+{
+  const lines = ipacData.trim().split('\n');
+  const headers = lines[0].split('|').map(header => header.trim());
+
+  // Converte os dados IPAC para um array de objetos JSON
+  return lines.slice(1).map(line =>
+  {
+    const values = line.split('|').map(value => value.trim());
+    let obj = {};
+    headers.forEach((header, i) =>
+    {
+      obj[header] = values[i];
+    });
+    return obj;
+  });
+}
 
 // Inicializar a cena
 init();
@@ -31,6 +67,9 @@ function init()
 
   renderer = new THREE.WebGLRenderer();
   renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.domElement.style.position = 'absolute';
+  renderer.domElement.style.top = '0';
+  renderer.domElement.style.left = '0';
   document.body.appendChild(renderer.domElement);
 
   raycaster = new THREE.Raycaster();
@@ -82,11 +121,14 @@ function init()
   // Movimento do fundo conforme o mouse mexe
   document.addEventListener('mousemove', (event) =>
   {
-    const mouseX = (event.clientX / window.innerWidth) * 2 - 1;
-    const mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+    if (!isFocusedOnStar)
+    {
+      const mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+      const mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
 
-    universe.rotation.y = mouseX * 0.05;
-    universe.rotation.x = mouseY * 0.05;
+      universe.rotation.y = mouseX * 0.05;
+      universe.rotation.x = mouseY * 0.05;
+    }
   });
 
   // Detectar clique nas estrelas
@@ -119,6 +161,14 @@ function init()
       exitZoom(controls);
     }
   });
+
+  // Adicionar event listener ao botão de rotação
+  const toggleRotationButton = document.getElementById('toggleRotation');
+  toggleRotationButton.addEventListener('click', () =>
+  {
+    isRotationEnabled = !isRotationEnabled;
+    toggleRotationButton.textContent = isRotationEnabled ? 'Desativar Rotação' : 'Ativar Rotação';
+  });
 }
 
 function exitZoom(controls)
@@ -140,6 +190,7 @@ function exitZoom(controls)
     } else
     {
       controls.enabled = false;  // Desativar os controles de órbita
+      isFocusedOnStar = false;  // Atualizar a variável de controle
     }
   }
 
@@ -175,6 +226,7 @@ function moveToStar(star, controls)
     {
       controls.enabled = true;  // Habilitar os controles de órbita
       controls.target.copy(star.position);
+      isFocusedOnStar = true;  // Atualizar a variável de controle
       displayPlanets(star);  // Mostrar os planetas após o movimento da câmera
     }
   }
@@ -239,8 +291,21 @@ function showPlanetInfo(planet)
   planetInfo.innerHTML = `${planet.userData.name}: ${planet.userData.info}`;
 }
 
+const ambient = new THREE.AmbientLight(0xffffff, 0.5);
+scene.add(ambient);
+
+// Função para rotacionar a cena
+function rotateScene()
+{
+  scene.rotation.y += 0.001;  // Ajuste a velocidade de rotação conforme necessário
+}
+
 function animate()
 {
   requestAnimationFrame(animate);
+  if (isRotationEnabled && !isFocusedOnStar)
+  {
+    rotateScene();
+  }
   renderer.render(scene, camera);
 }
