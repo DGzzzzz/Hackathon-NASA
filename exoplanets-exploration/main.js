@@ -15,39 +15,6 @@ const glowTexture = loader.load('/assets/images/glow.png');  // Textura de glow
 const universeTexture = loader.load('/assets/images/universe.jpg');
 const planetTexture = loader.load('/assets/images/planet.jpg');
 
-const apiUrl = 'https://exoplanetarchive.ipac.caltech.edu/cgi-bin/nstedAPI/nph-nstedAPI?&table=exoplanets&format=ipac&where=pl_kepflag=1';
-
-fetch(apiUrl)
-  .then(response => response.text()) // Recebe a resposta como texto
-  .then(data =>
-  {
-    const jsonData = parseIPAC(data); // Converter IPAC para JSON
-    console.log(jsonData); // Exibir dados no console
-  })
-  .catch(error =>
-  {
-    console.error('Error fetching data:', error);
-  });
-
-
-// Função para converter IPAC para JSON
-function parseIPAC(ipacData)
-{
-  const lines = ipacData.trim().split('\n');
-  const headers = lines[0].split('|').map(header => header.trim());
-
-  // Converte os dados IPAC para um array de objetos JSON
-  return lines.slice(1).map(line =>
-  {
-    const values = line.split('|').map(value => value.trim());
-    let obj = {};
-    headers.forEach((header, i) =>
-    {
-      obj[header] = values[i];
-    });
-    return obj;
-  });
-}
 
 // Inicializar a cena
 init();
