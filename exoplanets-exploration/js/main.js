@@ -67,7 +67,7 @@ function init()
   controls.enabled = false;  // Desativado até que uma estrela seja selecionada
 
   // Criar estrelas
-  for (let i = 0; i < exoplanetsData.length; i++)
+  for (let i = 0; i < exoplanetsData.length / 10; i++) // reduzido quantidade de estrelas
   {
     const starGeometry = new THREE.SphereGeometry(0.5, 24, 24);
     const starMaterial = new THREE.MeshStandardMaterial({
