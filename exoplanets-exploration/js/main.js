@@ -13,7 +13,7 @@ let exoplanetsData = [];
 const loader = new THREE.TextureLoader();
 const starTexture = loader.load('/assets/images/star.jpg');  // Textura da estrela
 const glowTexture = loader.load('/assets/images/glow.png');  // Textura de brilho
-const universeTexture = loader.load('/assets/images/universe.jpg');
+const universeTexture = loader.load('/assets/images/universe.jpeg');
 const planetTexture = loader.load('/assets/images/planet.jpg');
 
 const jsonFilePath = '/assets/data.json';
@@ -40,8 +40,8 @@ function init()
   camera.position.copy(initialCameraPosition);
 
   // Fundo do Universo
-  const universeMaterial = new THREE.MeshBasicMaterial({ map: universeTexture, side: THREE.BackSide });
-  const universeGeometry = new THREE.SphereGeometry(1000, 32, 32);
+  const universeMaterial = new THREE.MeshBasicMaterial({ map: universeTexture, side: THREE.BackSide, color: new THREE.Color(0x333333) });
+  const universeGeometry = new THREE.SphereGeometry(900, 32, 32);
   const universe = new THREE.Mesh(universeGeometry, universeMaterial);
   scene.add(universe);
 
