@@ -16,12 +16,6 @@ const glowTexture = loader.load('/assets/images/glow.png');  // Textura de brilh
 const universeTexture = loader.load('/assets/images/universe.jpg');
 const planetTexture = loader.load('/assets/images/planet.jpg');
 
-<<<<<<< HEAD:exoplanets-exploration/main.js
-
-// Inicializar a cena
-init();
-animate();
-=======
 const jsonFilePath = '/assets/data.json';
 
 // Buscar dados da API e inicializar a cena
@@ -38,7 +32,6 @@ fetch(jsonFilePath)
   {
     console.error('Erro ao buscar os dados:', error);
   });
->>>>>>> 9499bda4f12afb6cfef01a1ae32d43c7af63f209:exoplanets-exploration/js/main.js
 
 function init()
 {
@@ -48,7 +41,7 @@ function init()
 
   // Fundo do Universo
   const universeMaterial = new THREE.MeshBasicMaterial({ map: universeTexture, side: THREE.BackSide });
-  const universeGeometry = new THREE.SphereGeometry(500, 32, 32);
+  const universeGeometry = new THREE.SphereGeometry(1000, 32, 32);
   const universe = new THREE.Mesh(universeGeometry, universeMaterial);
   scene.add(universe);
 
