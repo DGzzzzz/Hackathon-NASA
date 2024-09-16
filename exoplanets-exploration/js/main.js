@@ -3,8 +3,9 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
 // Variáveis principais
 let scene, camera, renderer, raycaster, planets = [];
-let planetInfo, generateButton;
+let planetInfo, generateButton, toggleRotationButton;
 let exoplanetsData = [];
+let isRotationEnabled = false;
 
 // Carregar texturas
 const loader = new THREE.TextureLoader();
@@ -16,19 +17,23 @@ const jsonFilePath = '/assets/data.json';
 // Buscar dados da API e inicializar a cena
 fetch(jsonFilePath)
   .then(response => response.json())
-  .then(data => {
+  .then(data =>
+  {
     exoplanetsData = data;
     init();
     generateRandomPlanets();
     animate();
   })
-  .catch(error => {
+  .catch(error =>
+  {
     console.error('Erro ao buscar os dados:', error);
   });
 
-function init() {
+function init()
+{
   planetInfo = document.getElementById('info');
   generateButton = document.getElementById('generatePlanets');
+  toggleRotationButton = document.getElementById('toggleRotation');
 
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -54,35 +59,47 @@ function init() {
   controls.enablePan = false;
 
   // Detectar clique nos planetas
-  window.addEventListener('click', (event) => {
+  window.addEventListener('click', (event) =>
+  {
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
     raycaster.setFromCamera(mouse, camera);
     const intersects = raycaster.intersectObjects(planets);
-    if (intersects.length > 0) {
+    if (intersects.length > 0)
+    {
       const selectedPlanet = intersects[0].object;
       showPlanetInfo(selectedPlanet);
     }
   });
 
   // Redimensionar a tela
-  window.addEventListener('resize', () => {
+  window.addEventListener('resize', () =>
+  {
     renderer.setSize(window.innerWidth, window.innerHeight);
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
   });
 
   // Verificar se o botão está sendo clicado
-  generateButton.addEventListener('click', () => {
+  generateButton.addEventListener('click', () =>
+  {
     console.log('Gerando novos exoplanetas...');
     generateRandomPlanets();
   });
+
+  toggleRotationButton.addEventListener('click', () =>
+  {
+    isRotationEnabled = !isRotationEnabled;
+    toggleRotationButton.textContent = isRotationEnabled ? 'Desativar Rotação' : 'Ativar Rotação';
+  })
 }
 
 // Função para gerar 5 novos exoplanetas aleatórios
-function generateRandomPlanets() {
+function generateRandomPlanets()
+{
   // Remover planetas antigos corretamente
-  planets.forEach(planet => {
+  planets.forEach(planet =>
+  {
     scene.remove(planet);
     planet.geometry.dispose();  // Liberar a geometria
     planet.material.dispose();  // Liberar o material
@@ -93,7 +110,8 @@ function generateRandomPlanets() {
   const baseDistance = 15;
 
   // Gerar 5 novos planetas com informações da API
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < 5; i++)
+  {
     // Selecionar um exoplaneta aleatório
     const randomExoplanet = exoplanetsData[Math.floor(Math.random() * exoplanetsData.length)];
 
@@ -131,7 +149,8 @@ function generateRandomPlanets() {
 }
 
 // Exibir todas as informações do exoplaneta no card
-function showPlanetInfo(planet) {
+function showPlanetInfo(planet)
+{
   planetInfo.innerHTML = `
     <strong>${planet.userData.name}</strong><br>
     Período Orbital: ${planet.userData.period} dias<br>
@@ -146,7 +165,12 @@ function showPlanetInfo(planet) {
 }
 
 // Loop de animação
-function animate() {
+function animate()
+{
   requestAnimationFrame(animate);
+  if (isRotationEnabled)
+  {
+    scene.rotation.y += 0.001;
+  }
   renderer.render(scene, camera);
 }
