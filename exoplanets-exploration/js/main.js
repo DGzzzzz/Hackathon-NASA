@@ -10,7 +10,11 @@ let isRotationEnabled = false;
 // Carregar texturas
 const loader = new THREE.TextureLoader();
 const universeTexture = loader.load('/assets/images/universe.jpeg');
-const planetTexture = loader.load('/assets/images/planet.jpg');
+const planetTexture = {
+  generic: loader.load('/assets/images/planet.jpg'),
+  hot: loader.load('/assets/images/hot.jpg'),
+  cold: loader.load('/assets/images/cold.jpg')
+};
 
 const jsonFilePath = '/assets/data.json';
 
@@ -44,6 +48,15 @@ function init()
   const universeGeometry = new THREE.SphereGeometry(900, 32, 32);
   const universe = new THREE.Mesh(universeGeometry, universeMaterial);
   scene.add(universe);
+
+  // luz ambiente
+  const ambientLight = new THREE.AmbientLight(0x404040, 2);
+  scene.add(ambientLight);
+
+  // Luz direcional
+  const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+  directionalLight.position.set(5, 5, 5).normalize();
+  scene.add(directionalLight);
 
   renderer = new THREE.WebGLRenderer();
   renderer.setSize(window.innerWidth, window.innerHeight);
@@ -87,11 +100,24 @@ function init()
     generateRandomPlanets();
   });
 
+  // Verificar se o botão de rotação está sendo clicado
   toggleRotationButton.addEventListener('click', () =>
   {
     isRotationEnabled = !isRotationEnabled;
     toggleRotationButton.textContent = isRotationEnabled ? 'Desativar Rotação' : 'Ativar Rotação';
-  })
+  });
+
+}
+
+// ajustar textura com base na temperatura
+function getTextureForPlanet(temperature) {
+  if (temperature > 500) {
+    return planetTexture.hot;
+  } else if (temperature < 0) {
+    return planetTexture.cold;
+  } else {
+    return planetTexture.generic;
+  }
 }
 
 // Função para gerar 5 novos exoplanetas aleatórios
@@ -117,6 +143,9 @@ function generateRandomPlanets()
 
     // Calcular o tamanho do planeta com base no raio (koi_prad)
     const planetRadius = randomExoplanet.koi_prad || 1; // Usar o valor da API, com fallback para 1
+
+    // Ajustar textura com base na temperatura
+    const planetTexture = getTextureForPlanet(randomExoplanet.koi_teq);
 
     // Criar geometria e material do planeta
     const planetGeometry = new THREE.SphereGeometry(planetRadius, 24, 24);
