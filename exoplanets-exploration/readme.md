@@ -2,6 +2,8 @@
 
 Este projeto visualiza sistemas estelares com exoplanetas usando a biblioteca Three.js. Ele carrega dados de exoplanetas a partir de um arquivo JSON e gera um sistema estelar aleatório com planetas orbitando ao redor de uma estrela.
 
+O projeto ainda esta em andamento, e faz parte do desafio do [hackathon promovido pela NASA.](https://www.spaceappschallenge.org/)
+
 # Funcionalidades
 
 - Geração de sistemas estelares aleatórios.
