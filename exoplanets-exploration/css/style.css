@@ -17,7 +17,7 @@ body, html {
   justify-content: flex-start;
   pointer-events: none; /* Permite cliques passarem para o canvas */
 }
-#info, #toggleRotation {
+#info {
   pointer-events: auto; /* Permite cliques nos elementos */
   margin: 10px;
   padding: 10px;
@@ -25,8 +25,27 @@ body, html {
   color: white;
   border: none;
   border-radius: 5px;
-  z-index: 100000;
+  z-index: 100;
 }
-#toggleRotation {
+
+#generatePlanets, #toggleRotation {
   cursor: pointer;
+  pointer-events: auto;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 10px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 5px;
+}
+
+#toggleRotation {
+  top: 50px;
+}
+
+#generatePlanets:hover, #toggleRotation:hover {
+  background-color: #2980b9;
+  transition: ease 0.3s;
 }
