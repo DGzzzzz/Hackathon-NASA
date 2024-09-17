@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
 // Variáveis principais
-let scene, camera, renderer, raycaster, planets = [];
+let scene, camera, renderer, raycaster, currentStarSystem = null;
 let planetInfo, generateButton, toggleRotationButton;
 let exoplanetsData = [];
 let isRotationEnabled = false;
@@ -25,7 +25,7 @@ fetch(jsonFilePath)
   {
     exoplanetsData = data;
     init();
-    generateRandomPlanets();
+    generateRandomStarSystem();
     animate();
   })
   .catch(error =>
@@ -77,7 +77,7 @@ function init()
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
     raycaster.setFromCamera(mouse, camera);
-    const intersects = raycaster.intersectObjects(planets);
+    const intersects = raycaster.intersectObjects(currentStarSystem ? currentStarSystem.planets : []);
     if (intersects.length > 0)
     {
       const selectedPlanet = intersects[0].object;
@@ -96,8 +96,8 @@ function init()
   // Verificar se o botão está sendo clicado
   generateButton.addEventListener('click', () =>
   {
-    console.log('Gerando novos exoplanetas...');
-    generateRandomPlanets();
+    console.log('Gerando novo sistema estelar...');
+    generateRandomStarSystem();
   });
 
   // Verificar se o botão de rotação está sendo clicado
@@ -120,32 +120,61 @@ function getTextureForPlanet(temperature) {
   }
 }
 
-// Função para gerar 5 novos exoplanetas aleatórios
-function generateRandomPlanets()
-{
-  // Remover planetas antigos corretamente
-  planets.forEach(planet =>
-  {
-    scene.remove(planet);
-    planet.geometry.dispose();  // Liberar a geometria
-    planet.material.dispose();  // Liberar o material
+// Agrupar exoplanetas por estrela
+function groupExoplanetsByStar() {
+  const stars = {};
+  exoplanetsData.forEach(exoplanet => {
+    const starId = exoplanet.kepid;
+    if (!stars[starId]) {
+      stars[starId] = {
+        starId: starId,
+        planets: []
+      };
+    }
+    stars[starId].planets.push(exoplanet);
   });
-  planets = [];
+  return Object.values(stars);
+}
 
-  // Distância horizontal entre os planetas
-  const baseDistance = 15;
+// Função para gerar um sistema estelar aleatório
+function generateRandomStarSystem()
+{
+  // Remover sistema estelar antigo corretamente
+  if (currentStarSystem) {
+    currentStarSystem.planets.forEach(planet =>
+    {
+      scene.remove(planet);
+      planet.geometry.dispose();  // Liberar a geometria
+      planet.material.dispose();  // Liberar o material
+    });
+    scene.remove(currentStarSystem.starMesh);
+    currentStarSystem.starMesh.geometry.dispose();
+    currentStarSystem.starMesh.material.dispose();
+  }
 
-  // Gerar 5 novos planetas com informações da API
-  for (let i = 0; i < 5; i++)
+  // Agrupar exoplanetas por estrela
+  const starSystems = groupExoplanetsByStar();
+
+  // Selecionar um sistema estelar aleatório
+  const randomStarSystem = starSystems[Math.floor(Math.random() * starSystems.length)];
+
+  // Criar geometria e material da estrela
+  const starGeometry = new THREE.SphereGeometry(2, 24, 24);
+  const starMaterial = new THREE.MeshStandardMaterial({ color: 0xffff00 });
+  const starMesh = new THREE.Mesh(starGeometry, starMaterial);
+
+  // Posicionar a estrela
+  starMesh.position.set(0, 0, 0);
+  scene.add(starMesh);
+
+  // Adicionar planetas ao redor da estrela
+  const planets = randomStarSystem.planets.map((exoplanet, planetIndex) =>
   {
-    // Selecionar um exoplaneta aleatório
-    const randomExoplanet = exoplanetsData[Math.floor(Math.random() * exoplanetsData.length)];
-
     // Calcular o tamanho do planeta com base no raio (koi_prad)
-    const planetRadius = randomExoplanet.koi_prad || 1; // Usar o valor da API, com fallback para 1
+    const planetRadius = exoplanet.koi_prad || 1; // Usar o valor da API, com fallback para 1
 
     // Ajustar textura com base na temperatura
-    const planetTexture = getTextureForPlanet(randomExoplanet.koi_teq);
+    const planetTexture = getTextureForPlanet(exoplanet.koi_teq);
 
     // Criar geometria e material do planeta
     const planetGeometry = new THREE.SphereGeometry(planetRadius, 24, 24);
@@ -153,26 +182,32 @@ function generateRandomPlanets()
     const planet = new THREE.Mesh(planetGeometry, planetMaterial);
 
     // Adicionar cursor de pointer
-    planet.userData = { name: randomExoplanet.kepoi_name };
-    planet.cursor = 'pointer';  // Define o cursor como pointer
     planet.userData = {
-      name: randomExoplanet.kepoi_name,
-      period: randomExoplanet.koi_period,
-      radius: randomExoplanet.koi_prad,
-      temperature: randomExoplanet.koi_teq,
-      magnitude: randomExoplanet.koi_kepmag,
-      insol: randomExoplanet.koi_insol,
-      ra: randomExoplanet.ra_str,
-      dec: randomExoplanet.dec_str,
-      koiName: randomExoplanet.koi_name
+      name: exoplanet.kepoi_name,
+      period: exoplanet.koi_period,
+      radius: exoplanet.koi_prad,
+      temperature: exoplanet.koi_teq,
+      magnitude: exoplanet.koi_kepmag,
+      insol: exoplanet.koi_insol,
+      ra: exoplanet.ra_str,
+      dec: exoplanet.dec_str,
+      koiName: exoplanet.koi_name,
+      angle: Math.random() * Math.PI * 2, // Ângulo inicial aleatório
+      distance: 10 + planetIndex * 5 // Distância da estrela
     };
 
-    // Posicionar planetas lado a lado
-    planet.position.set(baseDistance * i - 30, 0, 0);
+    // Posicionar planetas ao redor da estrela
+    planet.position.set(
+      starMesh.position.x + Math.cos(planet.userData.angle) * planet.userData.distance,
+      starMesh.position.y + Math.sin(planet.userData.angle) * planet.userData.distance,
+      0
+    );
 
     scene.add(planet);
-    planets.push(planet);
-  }
+    return planet;
+  });
+
+  currentStarSystem = { starMesh, planets };
 
   planetInfo.innerHTML = 'Clique em um exoplaneta para ver as informações';
 }
@@ -201,5 +236,18 @@ function animate()
   {
     scene.rotation.y += 0.001;
   }
+
+  // Atualizar a posição dos planetas para simular a órbita
+  if (currentStarSystem) {
+    currentStarSystem.planets.forEach(planet => {
+      planet.userData.angle += 0.01; // Incrementar o ângulo para simular a órbita
+      planet.position.set(
+        currentStarSystem.starMesh.position.x + Math.cos(planet.userData.angle) * planet.userData.distance,
+        0, // Manter a posição Y constante
+        currentStarSystem.starMesh.position.z + Math.sin(planet.userData.angle) * planet.userData.distance
+      );
+    });
+  }
+
   renderer.render(scene, camera);
 }
