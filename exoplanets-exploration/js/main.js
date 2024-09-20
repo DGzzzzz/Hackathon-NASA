@@ -240,7 +240,7 @@ function animate()
   // Atualizar a posição dos planetas para simular a órbita
   if (currentStarSystem) {
     currentStarSystem.planets.forEach(planet => {
-      planet.userData.angle += 0.01; // Incrementar o ângulo para simular a órbita
+      planet.userData.angle += 0.005; // Incrementar o ângulo para simular a órbita
       planet.position.set(
         currentStarSystem.starMesh.position.x + Math.cos(planet.userData.angle) * planet.userData.distance,
         0, // Manter a posição Y constante
