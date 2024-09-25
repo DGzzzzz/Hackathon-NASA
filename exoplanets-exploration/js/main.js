@@ -9,7 +9,7 @@ let isRotationEnabled = false;
 
 // Carregar texturas
 const loader = new THREE.TextureLoader();
-const universeTexture = loader.load('/assets/images/universe.jpeg');
+const universeTexture = loader.load('https://servidor-estaticos.vercel.app/EBAC_Banking.png/assets/images/universe.jpeg');
 const planetTexture = {
   generic: loader.load('/assets/images/planet.jpg'),
   hot: loader.load('/assets/images/hot.jpg'),
