@@ -9,7 +9,7 @@ let isRotationEnabled = false;
 
 // Carregar texturas
 const loader = new THREE.TextureLoader();
-const universeTexture = loader.load('https://servidor-estaticos.vercel.app/EBAC_Banking.png/assets/images/universe.jpeg');
+const universeTexture = loader.load('https://servidor-estaticos.vercel.app/assets/images/universe.jpeg');
 const planetTexture = {
   generic: loader.load('/assets/images/planet.jpg'),
   hot: loader.load('/assets/images/hot.jpg'),
@@ -110,22 +110,29 @@ function init()
 }
 
 // ajustar textura com base na temperatura
-function getTextureForPlanet(temperature) {
-  if (temperature > 500) {
+function getTextureForPlanet(temperature)
+{
+  if (temperature > 500)
+  {
     return planetTexture.hot;
-  } else if (temperature < 0) {
+  } else if (temperature < 0)
+  {
     return planetTexture.cold;
-  } else {
+  } else
+  {
     return planetTexture.generic;
   }
 }
 
 // Agrupar exoplanetas por estrela
-function groupExoplanetsByStar() {
+function groupExoplanetsByStar()
+{
   const stars = {};
-  exoplanetsData.forEach(exoplanet => {
+  exoplanetsData.forEach(exoplanet =>
+  {
     const starId = exoplanet.kepid;
-    if (!stars[starId]) {
+    if (!stars[starId])
+    {
       stars[starId] = {
         starId: starId,
         planets: []
@@ -140,7 +147,8 @@ function groupExoplanetsByStar() {
 function generateRandomStarSystem()
 {
   // Remover sistema estelar antigo corretamente
-  if (currentStarSystem) {
+  if (currentStarSystem)
+  {
     currentStarSystem.planets.forEach(planet =>
     {
       scene.remove(planet);
@@ -238,8 +246,10 @@ function animate()
   }
 
   // Atualizar a posição dos planetas para simular a órbita
-  if (currentStarSystem) {
-    currentStarSystem.planets.forEach(planet => {
+  if (currentStarSystem)
+  {
+    currentStarSystem.planets.forEach(planet =>
+    {
       planet.userData.angle += 0.005; // Incrementar o ângulo para simular a órbita
       planet.position.set(
         currentStarSystem.starMesh.position.x + Math.cos(planet.userData.angle) * planet.userData.distance,
