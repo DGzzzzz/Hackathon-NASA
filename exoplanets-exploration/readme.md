@@ -42,7 +42,19 @@ npm run dev
 # Dependências
 - [Three.js:](https://threejs.org/) Biblioteca para renderização 3D.
 - [Vite:](https://vitejs.dev/) Ferramenta de build e servidor de desenvolvimento.
+- [Cypress: ](https://www.cypress.io/) Ferramenta de teste de front-end.
 
 # Controles
 - Gerar Novos Exoplanetas: Gera um novo sistema estelar aleatório.
 - Ativar/Desativar Rotação: Ativa ou desativa a rotação da cena.
+
+# Testes
+Para rodar os testes, siga os passos:
+- Cypress com interface:
+```sh
+npx cypress open
+```
+- Sem interface:
+```sh
+npx run cypress
+```
