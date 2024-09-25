@@ -20,7 +20,7 @@ O projeto ainda esta em andamento, e faz parte do desafio do [hackathon promovid
 - Clone o repositório:
 
 ```sh
- git clone https://github.com/seu-usuario/exoplanets-exploration.git
+ https://github.com/DGzzzzz/Hackathon-NASA.git
 ```
 - Instale as dependências:
 ```sh
