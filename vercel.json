@@ -1,24 +1,24 @@
 {
-    "version": 2,
-    "builds": [
-      {
-        "src": "exoplanets-exploration/package.json",
-        "use": "@vercel/static-build",
-        "config": {
-          "distDir": "exoplanets-exploration/dist"
-        }
+  "version": 2,
+  "builds": [
+    {
+      "src": "exoplanets-exploration/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
       }
-    ],
-    "routes": [
-      {
-        "src": "/assets/(.*)",
-        "dest": "/exoplanets-exploration/assets/$1"
-      },
-      {
-        "src": "/(.*)",
-        "dest": "/exoplanets-exploration/index.html"
-      }
-    ],
-    "buildCommand": "cd exoplanets-exploration && npm install && npm run build",
-    "outputDirectory": "exoplanets-exploration/dist"
-  }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/assets/(.*)",
+      "dest": "/assets/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ],
+  "buildCommand": "cd exoplanets-exploration && npm install && npm run build",
+  "outputDirectory": "dist"
+}
