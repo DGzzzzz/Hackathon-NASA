@@ -6,3 +6,15 @@ describe('DOM Reander', () =>
         cy.wait(5000)
     })
 })
+
+describe('JSON API', () =>
+{
+    it('verifica se a API conecta', () =>
+    {
+        const jsonFilePath = 'http://localhost:5173/assets/data.json';
+        cy.request(jsonFilePath).then((response) =>
+        {
+            expect(response.status).to.eq(200)
+        })
+    })
+})
