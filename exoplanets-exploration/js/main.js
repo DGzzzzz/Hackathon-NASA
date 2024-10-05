@@ -14,20 +14,15 @@ let isRotationEnabled = false;
 // Carregar texturas
 const loader = new THREE.TextureLoader();
 const universeTexture = loader.load(
-  "https://servidor-estaticos-three-amber.vercel.app/universe.jpeg"
+  "https://repo-estaticos.vercel.app/universe.jpeg"
 );
 const planetTexture = {
-  generic: loader.load(
-    "https://servidor-estaticos-three-amber.vercel.app/planet.jpg"
-  ),
-  hot: loader.load("https://servidor-estaticos-three-amber.vercel.app/hot.jpg"),
-  cold: loader.load(
-    "https://servidor-estaticos-three-amber.vercel.app/cold.jpg"
-  ),
+  generic: loader.load("https://repo-estaticos.vercel.app/planet.jpg"),
+  hot: loader.load("https://repo-estaticos.vercel.app/hot.jpg"),
+  cold: loader.load("https://repo-estaticos.vercel.app/cold.jpg"),
 };
 
-const jsonFilePath =
-  "https://servidor-estaticos-three-amber.vercel.app/data.json";
+const jsonFilePath = "https://repo-estaticos.vercel.app/data.json";
 
 // Buscar dados da API e inicializar a cena
 fetch(jsonFilePath)
