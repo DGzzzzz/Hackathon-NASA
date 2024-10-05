@@ -1,50 +1,66 @@
-import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import * as THREE from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 
 // Variáveis principais
-let scene, camera, renderer, raycaster, currentStarSystem = null;
+let scene,
+  camera,
+  renderer,
+  raycaster,
+  currentStarSystem = null;
 let planetInfo, generateButton, toggleRotationButton;
 let exoplanetsData = [];
 let isRotationEnabled = false;
 
 // Carregar texturas
 const loader = new THREE.TextureLoader();
-const universeTexture = loader.load('https://servidor-estaticos-three-amber.vercel.app/universe.jpeg');
+const universeTexture = loader.load(
+  "https://servidor-estaticos-three-amber.vercel.app/universe.jpeg"
+);
 const planetTexture = {
-  generic: loader.load('/assets/images/planet.jpg'),
-  hot: loader.load('/assets/images/hot.jpg'),
-  cold: loader.load('/assets/images/cold.jpg')
+  generic: loader.load(
+    "https://servidor-estaticos-three-amber.vercel.app/planet.jpg"
+  ),
+  hot: loader.load("https://servidor-estaticos-three-amber.vercel.app/hot.jpg"),
+  cold: loader.load(
+    "https://servidor-estaticos-three-amber.vercel.app/cold.jpg"
+  ),
 };
 
-const jsonFilePath = '/assets/data.json';
+const jsonFilePath =
+  "https://servidor-estaticos-three-amber.vercel.app/data.json";
 
 // Buscar dados da API e inicializar a cena
 fetch(jsonFilePath)
-  .then(response => response.json())
-  .then(data =>
-  {
+  .then((response) => response.json())
+  .then((data) => {
     exoplanetsData = data;
     init();
     generateRandomStarSystem();
     animate();
   })
-  .catch(error =>
-  {
-    console.error('Erro ao buscar os dados:', error);
+  .catch((error) => {
+    console.error("Erro ao buscar os dados:", error);
   });
 
-function init()
-{
-  planetInfo = document.getElementById('info');
-  generateButton = document.getElementById('generatePlanets');
-  toggleRotationButton = document.getElementById('toggleRotation');
+function init() {
+  planetInfo = document.getElementById("info");
+  generateButton = document.getElementById("generatePlanets");
+  toggleRotationButton = document.getElementById("toggleRotation");
 
   scene = new THREE.Scene();
-  camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  camera = new THREE.PerspectiveCamera(
+    75,
+    window.innerWidth / window.innerHeight,
+    0.1,
+    1000
+  );
   camera.position.set(0, 0, 50);
 
   // Fundo do Universo
-  const universeMaterial = new THREE.MeshBasicMaterial({ map: universeTexture, side: THREE.BackSide });
+  const universeMaterial = new THREE.MeshBasicMaterial({
+    map: universeTexture,
+    side: THREE.BackSide,
+  });
   const universeGeometry = new THREE.SphereGeometry(900, 32, 32);
   const universe = new THREE.Mesh(universeGeometry, universeMaterial);
   scene.add(universe);
@@ -72,70 +88,61 @@ function init()
   controls.enablePan = false;
 
   // Detectar clique nos planetas
-  window.addEventListener('click', (event) =>
-  {
+  window.addEventListener("click", (event) => {
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
     raycaster.setFromCamera(mouse, camera);
-    const intersects = raycaster.intersectObjects(currentStarSystem ? currentStarSystem.planets : []);
-    if (intersects.length > 0)
-    {
+    const intersects = raycaster.intersectObjects(
+      currentStarSystem ? currentStarSystem.planets : []
+    );
+    if (intersects.length > 0) {
       const selectedPlanet = intersects[0].object;
       showPlanetInfo(selectedPlanet);
     }
   });
 
   // Redimensionar a tela
-  window.addEventListener('resize', () =>
-  {
+  window.addEventListener("resize", () => {
     renderer.setSize(window.innerWidth, window.innerHeight);
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
   });
 
   // Verificar se o botão está sendo clicado
-  generateButton.addEventListener('click', () =>
-  {
-    console.log('Gerando novo sistema estelar...');
+  generateButton.addEventListener("click", () => {
+    console.log("Gerando novo sistema estelar...");
     generateRandomStarSystem();
   });
 
   // Verificar se o botão de rotação está sendo clicado
-  toggleRotationButton.addEventListener('click', () =>
-  {
+  toggleRotationButton.addEventListener("click", () => {
     isRotationEnabled = !isRotationEnabled;
-    toggleRotationButton.textContent = isRotationEnabled ? 'Desativar Rotação' : 'Ativar Rotação';
+    toggleRotationButton.textContent = isRotationEnabled
+      ? "Desativar Rotação"
+      : "Ativar Rotação";
   });
-
 }
 
 // ajustar textura com base na temperatura
-function getTextureForPlanet(temperature)
-{
-  if (temperature > 500)
-  {
+function getTextureForPlanet(temperature) {
+  if (temperature > 500) {
     return planetTexture.hot;
-  } else if (temperature < 0)
-  {
+  } else if (temperature < 0) {
     return planetTexture.cold;
-  } else
-  {
+  } else {
     return planetTexture.generic;
   }
 }
 
 // Agrupar exoplanetas por estrela
-function groupExoplanetsByStar()
-{
+function groupExoplanetsByStar() {
   const stars = {};
-  exoplanetsData.forEach(exoplanet =>
-  {
+  exoplanetsData.forEach((exoplanet) => {
     const starId = exoplanet.kepid;
-    if (!stars[starId])
-    {
+    if (!stars[starId]) {
       stars[starId] = {
         starId: starId,
-        planets: []
+        planets: [],
       };
     }
     stars[starId].planets.push(exoplanet);
@@ -144,16 +151,13 @@ function groupExoplanetsByStar()
 }
 
 // Função para gerar um sistema estelar aleatório
-function generateRandomStarSystem()
-{
+function generateRandomStarSystem() {
   // Remover sistema estelar antigo corretamente
-  if (currentStarSystem)
-  {
-    currentStarSystem.planets.forEach(planet =>
-    {
+  if (currentStarSystem) {
+    currentStarSystem.planets.forEach((planet) => {
       scene.remove(planet);
-      planet.geometry.dispose();  // Liberar a geometria
-      planet.material.dispose();  // Liberar o material
+      planet.geometry.dispose(); // Liberar a geometria
+      planet.material.dispose(); // Liberar o material
     });
     scene.remove(currentStarSystem.starMesh);
     currentStarSystem.starMesh.geometry.dispose();
@@ -164,7 +168,8 @@ function generateRandomStarSystem()
   const starSystems = groupExoplanetsByStar();
 
   // Selecionar um sistema estelar aleatório
-  const randomStarSystem = starSystems[Math.floor(Math.random() * starSystems.length)];
+  const randomStarSystem =
+    starSystems[Math.floor(Math.random() * starSystems.length)];
 
   // Criar geometria e material da estrela
   const starGeometry = new THREE.SphereGeometry(2, 24, 24);
@@ -176,8 +181,7 @@ function generateRandomStarSystem()
   scene.add(starMesh);
 
   // Adicionar planetas ao redor da estrela
-  const planets = randomStarSystem.planets.map((exoplanet, planetIndex) =>
-  {
+  const planets = randomStarSystem.planets.map((exoplanet, planetIndex) => {
     // Calcular o tamanho do planeta com base no raio (koi_prad)
     const planetRadius = exoplanet.koi_prad || 1; // Usar o valor da API, com fallback para 1
 
@@ -186,7 +190,9 @@ function generateRandomStarSystem()
 
     // Criar geometria e material do planeta
     const planetGeometry = new THREE.SphereGeometry(planetRadius, 24, 24);
-    const planetMaterial = new THREE.MeshStandardMaterial({ map: planetTexture });
+    const planetMaterial = new THREE.MeshStandardMaterial({
+      map: planetTexture,
+    });
     const planet = new THREE.Mesh(planetGeometry, planetMaterial);
 
     // Adicionar cursor de pointer
@@ -201,13 +207,15 @@ function generateRandomStarSystem()
       dec: exoplanet.dec_str,
       koiName: exoplanet.koi_name,
       angle: Math.random() * Math.PI * 2, // Ângulo inicial aleatório
-      distance: 10 + planetIndex * 5 // Distância da estrela
+      distance: 10 + planetIndex * 5, // Distância da estrela
     };
 
     // Posicionar planetas ao redor da estrela
     planet.position.set(
-      starMesh.position.x + Math.cos(planet.userData.angle) * planet.userData.distance,
-      starMesh.position.y + Math.sin(planet.userData.angle) * planet.userData.distance,
+      starMesh.position.x +
+        Math.cos(planet.userData.angle) * planet.userData.distance,
+      starMesh.position.y +
+        Math.sin(planet.userData.angle) * planet.userData.distance,
       0
     );
 
@@ -217,12 +225,11 @@ function generateRandomStarSystem()
 
   currentStarSystem = { starMesh, planets };
 
-  planetInfo.innerHTML = 'Clique em um exoplaneta para ver as informações';
+  planetInfo.innerHTML = "Clique em um exoplaneta para ver as informações";
 }
 
 // Exibir todas as informações do exoplaneta no card
-function showPlanetInfo(planet)
-{
+function showPlanetInfo(planet) {
   planetInfo.innerHTML = `
     <strong>${planet.userData.name}</strong><br>
     Período Orbital: ${planet.userData.period} dias<br>
@@ -237,24 +244,22 @@ function showPlanetInfo(planet)
 }
 
 // Loop de animação
-function animate()
-{
+function animate() {
   requestAnimationFrame(animate);
-  if (isRotationEnabled)
-  {
+  if (isRotationEnabled) {
     scene.rotation.y += 0.001;
   }
 
   // Atualizar a posição dos planetas para simular a órbita
-  if (currentStarSystem)
-  {
-    currentStarSystem.planets.forEach(planet =>
-    {
+  if (currentStarSystem) {
+    currentStarSystem.planets.forEach((planet) => {
       planet.userData.angle += 0.005; // Incrementar o ângulo para simular a órbita
       planet.position.set(
-        currentStarSystem.starMesh.position.x + Math.cos(planet.userData.angle) * planet.userData.distance,
+        currentStarSystem.starMesh.position.x +
+          Math.cos(planet.userData.angle) * planet.userData.distance,
         0, // Manter a posição Y constante
-        currentStarSystem.starMesh.position.z + Math.sin(planet.userData.angle) * planet.userData.distance
+        currentStarSystem.starMesh.position.z +
+          Math.sin(planet.userData.angle) * planet.userData.distance
       );
     });
   }
