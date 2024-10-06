@@ -226,15 +226,43 @@ function generateRandomStarSystem() {
 // Exibir todas as informações do exoplaneta no card
 function showPlanetInfo(planet) {
   planetInfo.innerHTML = `
-    <strong>${planet.userData.name}</strong><br>
-    Período Orbital: ${planet.userData.period} dias<br>
-    Raio: ${planet.userData.radius} raios terrestres<br>
-    Temperatura: ${planet.userData.temperature} K<br>
-    Magnitude: ${planet.userData.magnitude}<br>
-    Insolação: ${planet.userData.insol}<br>
-    RA: ${planet.userData.ra}<br>
-    Dec: ${planet.userData.dec}<br>
-    Nome KOI: ${planet.userData.koiName}
+      <table class="demo">
+      <thead></thead>
+      <tbody>
+        <tr>
+          <td class="left-align">Nome: </td>
+          <td class="api right-align">${planet.userData.name}</td>
+        </tr>
+        <tr>
+          <td class="left-align">Período Orbital: </td>
+          <td class="api right-align">${planet.userData.period} dias</td>
+        </tr>
+        <tr>
+          <td class="left-align">Raio: </td>
+          <td class="api right-align">${planet.userData.radius}</td>
+        </tr>
+        <tr>
+          <td class="left-align">Temperatura: </td>
+          <td class="api right-align">${planet.userData.temperature}</td>
+        </tr>
+        <tr>
+          <td class="left-align">Magnitude: </td>
+          <td class="api right-align">${planet.userData.magnitude}</td>
+        </tr>
+        <tr>
+          <td class="left-align">Insolação: </td>
+          <td class="api right-align">${planet.userData.insol}</td>
+        </tr>
+        <tr>
+          <td class="left-align">RA: </td>
+          <td class="api right-align">${planet.userData.ra}</td>
+        </tr>
+        <tr>
+          <td class="left-align">Dec: </td>
+          <td class="api right-align">${planet.userData.dec}</td>
+        </tr>
+      </tbody>
+    </table>
   `;
 }
 
