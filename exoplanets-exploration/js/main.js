@@ -16,10 +16,19 @@ const loader = new THREE.TextureLoader();
 const universeTexture = loader.load(
   "https://repo-estaticos.vercel.app/universe.jpeg"
 );
+
+const starTexture = {
+  yeallow: loader.load("https://repo-estaticos.vercel.app/G_TYPE_STAR.jpg"),
+  red: loader.load("https://repo-estaticos.vercel.app/M_TYPE_STAR.png"),
+  blue: loader.load("https://repo-estaticos.vercel.app/B_TYPE_STAR.png"),
+};
+
 const planetTexture = {
-  generic: loader.load("https://repo-estaticos.vercel.app/planet.jpg"),
-  hot: loader.load("https://repo-estaticos.vercel.app/hot.jpg"),
-  cold: loader.load("https://repo-estaticos.vercel.app/cold.jpg"),
+  kepler: loader.load("https://repo-estaticos.vercel.app/Kepler-22b.png"),
+  pegasi: loader.load("https://repo-estaticos.vercel.app/V391 Pegasi b.png"),
+  centuri: loader.load(
+    "https://repo-estaticos.vercel.app/Proxima Centauri b.png"
+  ),
 };
 
 const jsonFilePath = "https://repo-estaticos.vercel.app/data.json";
@@ -118,17 +127,6 @@ function init() {
   });
 }
 
-// ajustar textura com base na temperatura
-function getTextureForPlanet(temperature) {
-  if (temperature > 500) {
-    return planetTexture.hot;
-  } else if (temperature < 0) {
-    return planetTexture.cold;
-  } else {
-    return planetTexture.generic;
-  }
-}
-
 // Agrupar exoplanetas por estrela
 function groupExoplanetsByStar() {
   const stars = {};
@@ -166,9 +164,19 @@ function generateRandomStarSystem() {
   const randomStarSystem =
     starSystems[Math.floor(Math.random() * starSystems.length)];
 
+  const starRadius = randomStarSystem.planets[0].koi_srad || 1;
+
+  const starTextureKeys = Object.keys(starTexture);
+  const randomStarTexture =
+    starTexture[
+      starTextureKeys[Math.floor(Math.random() * starTextureKeys.length)]
+    ];
+
   // Criar geometria e material da estrela
-  const starGeometry = new THREE.SphereGeometry(2, 24, 24);
-  const starMaterial = new THREE.MeshStandardMaterial({ color: 0xffff00 });
+  const starGeometry = new THREE.SphereGeometry(starRadius * 4, 24, 24);
+  const starMaterial = new THREE.MeshStandardMaterial({
+    map: randomStarTexture,
+  });
   const starMesh = new THREE.Mesh(starGeometry, starMaterial);
 
   // Posicionar a estrela
@@ -180,13 +188,16 @@ function generateRandomStarSystem() {
     // Calcular o tamanho do planeta com base no raio (koi_prad)
     const planetRadius = exoplanet.koi_prad || 1; // Usar o valor da API, com fallback para 1
 
-    // Ajustar textura com base na temperatura
-    const planetTexture = getTextureForPlanet(exoplanet.koi_teq);
+    const planetTextureKeys = Object.keys(planetTexture);
+    const randomTexture =
+      planetTexture[
+        planetTextureKeys[Math.floor(Math.random() * planetTextureKeys.length)]
+      ];
 
     // Criar geometria e material do planeta
-    const planetGeometry = new THREE.SphereGeometry(planetRadius, 24, 24);
+    const planetGeometry = new THREE.SphereGeometry(planetRadius / 2, 24, 24);
     const planetMaterial = new THREE.MeshStandardMaterial({
-      map: planetTexture,
+      map: randomTexture,
     });
     const planet = new THREE.Mesh(planetGeometry, planetMaterial);
 
@@ -202,7 +213,7 @@ function generateRandomStarSystem() {
       dec: exoplanet.dec_str,
       koiName: exoplanet.koi_name,
       angle: Math.random() * Math.PI * 2, // Ângulo inicial aleatório
-      distance: 10 + planetIndex * 5, // Distância da estrela
+      distance: 10 + planetIndex * 50, // Distância da estrela
     };
 
     // Posicionar planetas ao redor da estrela
