@@ -4,6 +4,8 @@ Este projeto visualiza sistemas estelares com exoplanetas usando a biblioteca Th
 
 O projeto ainda esta em andamento, e faz parte do desafio do [hackathon promovido pela NASA.](https://www.spaceappschallenge.org/)
 
+Projeto do [Web site](https://github.com/renaanc/NASA-HACKATHON-WEBSITE).
+
 # Funcionalidades
 
 - Geração de sistemas estelares aleatórios.
